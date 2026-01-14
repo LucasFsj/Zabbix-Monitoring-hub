@@ -1,4 +1,6 @@
 const express = require ("express");
+const healthRoutes = require('./routes/health.routes')
+
 const app = express();
 
 
@@ -6,10 +8,6 @@ const app = express();
 app.use(express.json());
 
 // rota de healthcheck
-app.get('/health', (req, res) => {
-    res.status(200).json({
-        status: 'ok'
-    })
-});
+app.use('/api',healthRoutes);
 
 module.exports = app;
