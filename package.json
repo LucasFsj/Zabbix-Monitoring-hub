@@ -1,0 +1,18 @@
+{
+  "name": "zabbix-monitoring-hub",
+  "version": "1.0.0",
+  "main": "servers.js",
+ "scripts": {
+  "dev": "node src/server.js",
+  "start": "node src/server.js",
+  "lint": "echo \"lint: TODO\"",
+  "test": "echo \"test: TODO\""
+  },  
+  "engines": {
+  "node": ">=18"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
