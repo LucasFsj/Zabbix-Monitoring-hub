@@ -1,0 +1,91 @@
+zabbix_export:
+  version: '7.4'
+  template_groups:
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    - uuid: 2798380826e24e4c9dbe83d295cfb685
+      template: 'Template App Node.js - Zabbix Monitoring Hub'
+      name: 'Template App Node.js - Zabbix Monitoring Hub'
+      groups:
+        - name: Templates/Applications
+      items:
+        - uuid: a089a90544a64a81a9ac151d72c085a6
+          name: 'API Healthcheck'
+          type: HTTP_AGENT
+          key: monitoring_hub.health
+          delay: 30s
+          value_type: TEXT
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.status
+          url: '{$APP.BASE_URL}{$APP.HEALTH_PATH}'
+          triggers:
+            - uuid: 9a634c2a6e0642c3a3b80254b1ce75d1
+              expression: 'nodata(/Template App Node.js - Zabbix Monitoring Hub/monitoring_hub.health,{$APP.NODATA_SEC})=1'
+              name: 'API Node.js is down'
+              priority: HIGH
+        - uuid: e89b7563169c4253a0cd702a9cfa8ba4
+          name: 'Node Heap Used (bytes)'
+          type: DEPENDENT
+          key: monitoring_hub.memory.heap_used_bytes
+          units: B
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.memory_heap_used_bytes
+          master_item:
+            key: monitoring_hub.metrics.raw
+          triggers:
+            - uuid: 09af6f0d6356498ba6512686e152c151
+              expression: 'last(/Template App Node.js - Zabbix Monitoring Hub/monitoring_hub.memory.heap_used_bytes) > {$APP.HEAP_USED_MAX}'
+              name: 'Node.js heap usage is high'
+              priority: WARNING
+        - uuid: 9ee349a53dc940d2901c8c23f1aaad68
+          name: 'Node RSS Memory (bytes)'
+          type: DEPENDENT
+          key: monitoring_hub.memory.rss_bytes
+          units: B
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.memory_rss_bytes
+          master_item:
+            key: monitoring_hub.metrics.raw
+        - uuid: d686c0e8f51a444fab498dbeb1482420
+          name: 'API Metrics (raw JSON)'
+          type: HTTP_AGENT
+          key: monitoring_hub.metrics.raw
+          delay: 60s
+          value_type: TEXT
+          url: '{$APP.BASE_URL}{$APP.METRICS_PATH}'
+        - uuid: cd2c0101fcac473ea769ca9138f049c8
+          name: 'Node Uptime (seconds)'
+          type: DEPENDENT
+          key: monitoring_hub.uptime_seconds
+          units: s
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.uptime_seconds
+          master_item:
+            key: monitoring_hub.metrics.raw
+          triggers:
+            - uuid: d2d4f341704b44d58c89cfb60f8e54a3
+              expression: 'change(/Template App Node.js - Zabbix Monitoring Hub/monitoring_hub.uptime_seconds)<0'
+              name: 'Node.js application restarted'
+              priority: INFO
+      macros:
+        - macro: '{$APP.BASE_URL}'
+          value: 'http://127.0.0.1:3020'
+        - macro: '{$APP.HEALTH_PATH}'
+          value: /api/health
+        - macro: '{$APP.HEAP_USED_MAX}'
+          value: 300M
+        - macro: '{$APP.HTTP_TIMEOUT}'
+          value: 5s
+        - macro: '{$APP.METRICS_PATH}'
+          value: /api/metrics
+        - macro: '{$APP.NODATA_SEC}'
+          value: '120'
