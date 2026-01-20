@@ -79,6 +79,33 @@ GET /api/metrics
 
 template/template-nodejs-zabbix-monitoring-hub-final.yaml
 
+## ✅ Como validar o monitoramento
+
+1. Suba a aplicação Node.js monitorada
+2. Importe o template `template-nodejs-zabbix-monitoring-hub-final.yaml` no Zabbix
+3. Crie um Host e vincule o template
+4. Configure as macros (ex.: URL base da API)
+5. Acesse **Monitoring → Latest data** e verifique as métricas:
+   - Uptime
+   - Uso de memória (heap, rss)
+6. Para simular falha:
+   - Pare a aplicação Node.js (`Ctrl + C`)
+   - Aguarde o tempo de verificação
+   - Verifique o trigger de indisponibilidade disparado
+## 📸 Exemplos no Zabbix
+
+### Template importado
+![Template](docs/images/problems.png)
+
+### Macros configuradas
+![Macros](docs/images/macros.png)
+
+### Métricas (Latest Data)
+![Latest Data](docs/images/latest-data.png)
+
+### Trigger de indisponibilidade
+![Trigger](docs/images/triggers.png)
+
 ## 📄 Licença
 Uso educacional e demonstrativo.
 
